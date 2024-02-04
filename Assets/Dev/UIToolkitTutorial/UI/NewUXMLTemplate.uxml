@@ -1,0 +1,27 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/Dev/UI/SampleStyle.uss?fileID=7433441132597879392&amp;guid=2c5326121c1847047ba7b73014045243&amp;type=3#SampleStyle" />
+    <ui:VisualElement name="VisualElement" style="flex-grow: 1; -unity-background-image-tint-color: rgb(255, 255, 255); background-color: rgba(255, 0, 0, 0); width: 100%; height: 100%; flex-wrap: nowrap; align-items: stretch; justify-content: flex-start; flex-direction: column; min-width: auto;">
+        <ui:VisualElement name="top" style="flex-grow: 1; -unity-background-image-tint-color: rgb(255, 255, 255); background-color: rgb(0, 0, 0); width: 100%; height: 50%; flex-wrap: nowrap; align-items: flex-end; justify-content: space-around; flex-direction: row; flex-shrink: 1;">
+            <ui:VisualElement name="image_boy" class="image--boy image--boy-inair" />
+            <ui:VisualElement name="image_robot" style="flex-grow: 0; background-image: url(&apos;project://database/Assets/Dev/Res/UI/Hyperspace%20-%20Robot%202.png?fileID=2800000&amp;guid=85ea9d20ad79ea940b0b59110362d134&amp;type=3#Hyperspace - Robot 2&apos;); width: 150px; height: 300px; max-width: none; min-width: auto;" />
+        </ui:VisualElement>
+        <ui:VisualElement name="bottom" style="flex-grow: 1; -unity-background-image-tint-color: rgb(255, 255, 255); background-color: rgb(255, 255, 255); width: 100%; height: 50%; flex-wrap: nowrap; align-items: stretch; justify-content: flex-start; border-top-left-radius: 40px; border-top-right-radius: 40px; display: flex; border-left-color: rgba(0, 0, 0, 0); border-right-color: rgba(0, 0, 0, 0); border-top-color: rgba(0, 0, 0, 0); border-bottom-color: rgba(0, 0, 0, 0);">
+            <ui:VisualElement name="VisualElement" style="flex-grow: 0; height: 80%; width: 100%; justify-content: flex-start;">
+                <ui:Label text="Quamquam" name="text_title" class="text--title" style="-unity-font-definition: url(&apos;project://database/Assets/Dev/UI%20Toolkit/UnityDefaultRuntimeTheme.tss?fileID=2230732570650464555&amp;guid=543cd9fe3f3f74e1fa43a1538bdb5564&amp;type=3#NotInter-Regular&apos;);" />
+                <ui:Label text="Quamquam ab iis phlosophiam et omnes ignenuas disciplinas habemus; Sed in rebus apertissimis nimium logi sumus. Sed quanta sit alias, nunc tantum possitne esse tanta. Vos autemcum perspicuis dubia Quamquam ab iis phlosophiam et omnes ignenuas disciplinas habemus; Sed in rebus apertissimis nimium logi sumus. Sed quanta sit alias, nunc tantum possitne esse tanta. Vos autemcum perspicuis dubia Quamquam ab iis phlosophiam et omnes ignenuas disciplinas habemus; Sed in rebus apertissimis nimium logi sumus. Sed quanta sit alias, nunc tantum possitne esse tanta. Vos autemcum perspicuis dubia ddd" name="text_paragraph" class="text--paragraph" />
+            </ui:VisualElement>
+            <ui:VisualElement style="flex-grow: 1; width: 100%; height: 20%; justify-content: center; padding-right: 60px; padding-left: 60px;">
+                <ui:Button text="Button" name="button_open" class="button-blue" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+    <ui:VisualElement name="container_bottom" style="flex-grow: 1; position: absolute; top: 0; background-color: rgba(0, 0, 0, 0); left: 0; bottom: 100%; right: 100%; height: 100%; width: 100%; opacity: 1; display: flex; visibility: visible;">
+        <ui:VisualElement name="scrim" class="scrim" />
+        <ui:VisualElement name="bottomsheet" class="bottomsheet">
+            <ui:Label text="Omnes" name="Label" class="text--title" style="-unity-font-definition: url(&apos;project://database/Assets/Dev/UI%20Toolkit/UnityDefaultRuntimeTheme.tss?fileID=2230732570650464555&amp;guid=543cd9fe3f3f74e1fa43a1538bdb5564&amp;type=3#NotInter-Regular&apos;);" />
+            <ui:VisualElement name="image_girl" class="image--girl image--girl--up" />
+            <ui:Label text="Sed in rebus apertissimis nimium longi sumus." name="message" style="flex-grow: 1; height: auto; -unity-text-align: middle-center; font-size: 30px;" />
+            <ui:Button text="X" name="button_close" style="position: absolute; right: 50px; border-top-width: 0; border-right-width: 0; border-bottom-width: 0; border-left-width: 0; background-color: rgba(188, 188, 188, 0); font-size: 54px; color: rgb(144, 144, 144); -unity-font-style: bold; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; height: 49px; top: 38px; width: 55px;" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

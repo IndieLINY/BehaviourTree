@@ -1,0 +1,26 @@
+GridBackground {
+    --grid-background-color: rgb(40, 40, 40);
+    --line-color: rgba(193, 196, 192, 0.1);
+    --thick-line-color: rgba(193, 196, 192, 0.1);
+    --spacing: 15;
+}
+
+.panel-label-default {
+    height: 22px;
+    background-color: rgb(35, 35, 35);
+    font-size: 14px;
+    -unity-text-align: middle-left;
+    padding-right: 2px;
+    padding-left: 10px;
+    width: 100%;
+}
+
+.toolbar-menu-default {
+    height: 100%;
+    flex-grow: 0;
+    flex-shrink: 0;
+    width: 70px;
+    flex-direction: row;
+    justify-content: flex-start;
+    -unity-text-align: middle-center;
+}

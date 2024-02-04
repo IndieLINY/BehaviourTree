@@ -1,0 +1,17 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <Style src="project://database/Assets/Dev/BehaviourTree/BTEditor.uss?fileID=7433441132597879392&amp;guid=9e1fd1f497ceb0441b830fa21d2fe01e&amp;type=3#BTEditor" />
+    <uie:Toolbar style="height: 25px;">
+        <uie:ToolbarMenu text="Assets" name="toolbar_menu_assets" class="toolbar-menu-default" />
+    </uie:Toolbar>
+    <SplitView fixed-pane-initial-dimension="500" style="width: 100%; height: 100%;">
+        <ui:VisualElement name="left-panel" style="flex-grow: 1; width: 50%; flex-shrink: 1; height: 100%;">
+            <ui:Label text="Inspector" class="panel-label-default" />
+            <InspectorView />
+        </ui:VisualElement>
+        <ui:VisualElement name="right-panel" style="flex-grow: 1; flex-shrink: 1;">
+            <BTEditorView name="BTEditorView" style="flex-grow: 1;">
+                <ui:Label text="BehaviourTree View" class="panel-label-default" />
+            </BTEditorView>
+        </ui:VisualElement>
+    </SplitView>
+</ui:UXML>
