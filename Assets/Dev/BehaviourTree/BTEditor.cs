@@ -6,92 +6,96 @@ using UnityEngine;
 using UnityEngine.Serialization;
 using UnityEngine.UIElements;
 
-public class BTEditor : EditorWindow
+namespace IndieLINY.AI.BehaviourTree.Editor
 {
-    private BTEditorView btView;
-    private InspectorView inspectorView;
-    private BTMain btMain;
-
-    private BTEditorPresenter _presenter;
-
-    private const string VISUAL_ASSET_PATH = "Assets/Dev/BehaviourTree/BTEditor.uxml";
-    private const string STYLE_SHEET_PATH = "Assets/Dev/BehaviourTree/BTEditor.uss";
-
-    private const string TOOLBAR_ASSET_KEY = "toolbar_menu_assets";
-    
-    public static void CreateWindow(BTMain btMain)
+    public class BTEditor : EditorWindow
     {
-        BTEditor wnd = GetWindow<BTEditor>();
-        
-        wnd.titleContent = new GUIContent("BTEditor");
-        wnd.btMain = btMain;
-        
-        wnd.EndOfCreate();
-    }
+        private BTEditorView btView;
+        private InspectorView inspectorView;
+        private BTMain btMain;
 
-    public void CreateGUI()
-    {
-        VisualElement root = rootVisualElement;
-        
-        // 에셋 불러오기
-        var tree = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(VISUAL_ASSET_PATH);
-        tree.CloneTree(root);
+        private BTEditorPresenter _presenter;
 
-        var editorStyleSheet = AssetDatabase.LoadAssetAtPath<StyleSheet>(STYLE_SHEET_PATH);
-        root.styleSheets.Add(editorStyleSheet);
+        private const string VISUAL_ASSET_PATH = "Assets/Dev/BehaviourTree/BTEditor.uxml";
+        private const string STYLE_SHEET_PATH = "Assets/Dev/BehaviourTree/BTEditor.uss";
 
-        // VisualElement 바인딩
-        btView = root.Q<BTEditorView>("BTEditorView");
-        inspectorView = root.Q<InspectorView>();
+        private const string TOOLBAR_ASSET_KEY = "toolbar_menu_assets";
 
-        // 이벤트 바인딩
-        ToolbarInit(root);
-
-        EndOfCreate();
-    }
-
-    private void EndOfCreate()
-    {
-        if (btMain)
+        public static void CreateWindow(BTMain btMain)
         {
-            _presenter = new BTEditorPresenter(btMain, btView);
-            _presenter.OnNodeSelected = OnNodeSelected;
-            
-            btView.PopulateView(_presenter);
+            BTEditor wnd = GetWindow<BTEditor>();
+
+            wnd.titleContent = new GUIContent("BTEditor");
+            wnd.btMain = btMain;
+
+            wnd.EndOfCreate();
+        }
+
+        public void CreateGUI()
+        {
+            VisualElement root = rootVisualElement;
+
+            // 에셋 불러오기
+            var tree = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(VISUAL_ASSET_PATH);
+            tree.CloneTree(root);
+
+            var editorStyleSheet = AssetDatabase.LoadAssetAtPath<StyleSheet>(STYLE_SHEET_PATH);
+            root.styleSheets.Add(editorStyleSheet);
+
+            // VisualElement 바인딩
+            btView = root.Q<BTEditorView>("BTEditorView");
+            inspectorView = root.Q<InspectorView>();
+
+            // 이벤트 바인딩
+            ToolbarInit(root);
+
+            EndOfCreate();
+        }
+
+        private void EndOfCreate()
+        {
+            if (btMain)
+            {
+                _presenter = new BTEditorPresenter(btMain, btView);
+                _presenter.OnNodeSelected = OnNodeSelected;
+
+                btView.PopulateView(_presenter);
+            }
+        }
+
+        private void OnNodeSelected(BTNodeView nodeView)
+        {
+            inspectorView.UpdateSelection(nodeView);
+        }
+
+        private void ToolbarInit(VisualElement root)
+        {
+            var assetsToolbar = root.Q<ToolbarMenu>(TOOLBAR_ASSET_KEY);
         }
     }
 
-    private void OnNodeSelected(BTNodeView nodeView)
+    [InitializeOnLoad]
+    public class BTMainDoubleClick
     {
-        inspectorView.UpdateSelection(nodeView);
-    }
-
-    private void ToolbarInit(VisualElement root)
-    {
-        var assetsToolbar = root.Q<ToolbarMenu>(TOOLBAR_ASSET_KEY);
-    }
-    
-}
-
-[InitializeOnLoad]
-public class BTMainDoubleClick
-{
-    static BTMainDoubleClick()
-    {
-        EditorApplication.projectWindowItemOnGUI += OnProjectWindowItemGUI;
-    }
-    private static void OnProjectWindowItemGUI(string guid, Rect selectionRect)
-    {
-        Event e = Event.current;
-
-        if (e.isMouse && e.type == EventType.MouseDown && e.clickCount == 2 && selectionRect.Contains(e.mousePosition))
+        static BTMainDoubleClick()
         {
-            var path = AssetDatabase.GUIDToAssetPath(guid);
-            var bt = AssetDatabase.LoadAssetAtPath<BTMain>(path);
+            EditorApplication.projectWindowItemOnGUI += OnProjectWindowItemGUI;
+        }
 
-            if(bt)
+        private static void OnProjectWindowItemGUI(string guid, Rect selectionRect)
+        {
+            Event e = Event.current;
+
+            if (e.isMouse && e.type == EventType.MouseDown && e.clickCount == 2 &&
+                selectionRect.Contains(e.mousePosition))
             {
-                BTEditor.CreateWindow(bt);
+                var path = AssetDatabase.GUIDToAssetPath(guid);
+                var bt = AssetDatabase.LoadAssetAtPath<BTMain>(path);
+
+                if (bt)
+                {
+                    BTEditor.CreateWindow(bt);
+                }
             }
         }
     }

@@ -4,75 +4,74 @@ using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-public class BTNodeView : UnityEditor.Experimental.GraphView.Node
+namespace IndieLINY.AI.BehaviourTree.Editor
 {
-    public BTNode node;
-    public Port input;
-    public Port output;
-    public System.Action<BTNodeView> OnNodeSelected;
-    
-    private BTEditorView _editorView;
-
-    public BTNodeView(BTNode node, BTEditorView editorView)
+    public class BTNodeView : UnityEditor.Experimental.GraphView.Node
     {
-        this.node = node;
-        this.title = node.name;
-        this.name = node.name;
-        this.viewDataKey = node.guid;
+        public BTNode node;
+        public Port input;
+        public Port output;
+        public System.Action<BTNodeView> OnNodeSelected;
 
-        this._editorView = editorView;
+        private BTEditorView _editorView;
 
-        style.left = node.nodeViewPosition.x;
-        style.top = node.nodeViewPosition.y;
-
-        CreateInputPorts();
-        CreateOutputPorts();
-    }
-
-    private void CreateInputPorts()
-    {
-        input = InstantiatePort(Orientation.Vertical, Direction.Input, Port.Capacity.Single, typeof(bool));
-
-        if (input != null)
+        public BTNodeView(BTNode node, BTEditorView editorView)
         {
-            input.portName = "";
-            inputContainer.Add(input);
+            this.node = node;
+            this.title = node.name;
+            this.name = node.name;
+            this.viewDataKey = node.guid;
+
+            this._editorView = editorView;
+
+            style.left = node.nodeViewPosition.x;
+            style.top = node.nodeViewPosition.y;
+
+            CreateInputPorts();
+            CreateOutputPorts();
         }
-    }
 
-    private void CreateOutputPorts()
-    {
-        output = InstantiatePort(Orientation.Vertical, Direction.Output, Port.Capacity.Multi, typeof(bool));
-        if (output != null)
+        private void CreateInputPorts()
         {
-            output.portName = "";
-            outputContainer.Add(output);
+            input = InstantiatePort(Orientation.Vertical, Direction.Input, Port.Capacity.Single, typeof(bool));
+
+            if (input != null)
+            {
+                input.portName = "";
+                inputContainer.Add(input);
+            }
         }
-    }
 
-    public override void BuildContextualMenu(ContextualMenuPopulateEvent evt)
-    {
-        base.BuildContextualMenu(evt);
-        
-        evt.menu.AppendAction("delete node", x =>
+        private void CreateOutputPorts()
         {
-            _editorView.OnDeleteNode(this);
-        });
-    }
+            output = InstantiatePort(Orientation.Vertical, Direction.Output, Port.Capacity.Multi, typeof(bool));
+            if (output != null)
+            {
+                output.portName = "";
+                outputContainer.Add(output);
+            }
+        }
 
-    public override void SetPosition(Rect newPos)
-    {
-        base.SetPosition(newPos);
+        public override void BuildContextualMenu(ContextualMenuPopulateEvent evt)
+        {
+            base.BuildContextualMenu(evt);
 
-        node.nodeViewPosition.x = newPos.xMin;
-        node.nodeViewPosition.y = newPos.yMin;
-    }
+            evt.menu.AppendAction("delete node", x => { _editorView.OnDeleteNode(this); });
+        }
 
-    public override void OnSelected()
-    {
-        base.OnSelected();
+        public override void SetPosition(Rect newPos)
+        {
+            base.SetPosition(newPos);
 
-        OnNodeSelected?.Invoke(this);
+            node.nodeViewPosition.x = newPos.xMin;
+            node.nodeViewPosition.y = newPos.yMin;
+        }
 
+        public override void OnSelected()
+        {
+            base.OnSelected();
+
+            OnNodeSelected?.Invoke(this);
+        }
     }
 }

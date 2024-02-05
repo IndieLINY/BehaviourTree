@@ -3,12 +3,21 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
+using IndieLINY.AI.BehaviourTree;
+
 [CreateAssetMenu(menuName = "AI/BehaviourTree", fileName = "BehaviourTree")]
 public class BTMain : ScriptableObject
 {
-    public BTNode root;
+    public BTNRoot root;
 
     public List<BTNode> nodes = new List<BTNode>();
+
+    public BTEventManager EventManager { get; private set; }
+
+    public void Init()
+    {
+        EventManager = new BTEventManager();
+    }
 
     public BTNode CreateNode(System.Type type)
     {
