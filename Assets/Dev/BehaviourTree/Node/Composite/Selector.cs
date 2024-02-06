@@ -21,47 +21,8 @@ namespace IndieLINY.AI.BehaviourTree
             _currentIndex = 0;
         }
 
-        public override BTEvaluateResult EValuate(EBTEvaluateState? childEvaluateState)
+        protected override BTEvaluateResult DownEvaluate()
         {
-            
-            if (childEvaluateState != null)
-            {
-                if (childEvaluateState.Value == EBTEvaluateState.Running)
-                {
-                    return new BTEvaluateResult()
-                    {
-                        State = EBTEvaluateState.Running,
-                        ToEvaluateNode = childs[_currentIndex]
-                    };
-                }
-                
-                if (childEvaluateState.Value == EBTEvaluateState.Success)
-                {
-                    return new BTEvaluateResult()
-                    {
-                        State = EBTEvaluateState.Success,
-                        ToEvaluateNode = null
-                    };
-                }
-                
-                if (childEvaluateState.Value == EBTEvaluateState.Failure)
-                {
-                    if (childs.Count <= _currentIndex + 1)
-                    {
-                        return new BTEvaluateResult()
-                        {
-                            State = EBTEvaluateState.Failure,
-                            ToEvaluateNode = null
-                        };  
-                    }
-                    
-                    return new BTEvaluateResult()
-                    {
-                        State = EBTEvaluateState.Running,
-                        ToEvaluateNode = childs[++_currentIndex]
-                    };
-                }
-            }
             
             if (childs.Count <= _currentIndex)
             {
@@ -77,6 +38,48 @@ namespace IndieLINY.AI.BehaviourTree
                 State = EBTEvaluateState.Running,
                 ToEvaluateNode = childs[_currentIndex]
             };
+        }
+
+        protected override BTEvaluateResult UpEvaluate(EBTEvaluateState childEvaluateState)
+        {
+            if (childEvaluateState == EBTEvaluateState.Running)
+            {
+                return new BTEvaluateResult()
+                {
+                    State = EBTEvaluateState.Running,
+                    ToEvaluateNode = childs[_currentIndex]
+                };
+            }
+                
+            if (childEvaluateState == EBTEvaluateState.Success)
+            {
+                return new BTEvaluateResult()
+                {
+                    State = EBTEvaluateState.Success,
+                    ToEvaluateNode = null
+                };
+            }
+                
+            if (childEvaluateState == EBTEvaluateState.Failure)
+            {
+                if (childs.Count <= _currentIndex + 1)
+                {
+                    return new BTEvaluateResult()
+                    {
+                        State = EBTEvaluateState.Failure,
+                        ToEvaluateNode = null
+                    };  
+                }
+                    
+                return new BTEvaluateResult()
+                {
+                    State = EBTEvaluateState.Running,
+                    ToEvaluateNode = childs[++_currentIndex]
+                };
+            }
+
+            Debug.Assert(false, "selector's undefined state");
+            return default;
         }
     }
 }

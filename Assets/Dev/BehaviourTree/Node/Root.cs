@@ -14,7 +14,7 @@ namespace IndieLINY.AI.BehaviourTree
         public IBTNode SetParent(IBTNode parent)
             => throw new System.NotImplementedException();
 
-        public void AddChild(IBTNode node)
+        public void SetChild(IBTNode node)
         {
             _child = node;
             node.SetParent(this);

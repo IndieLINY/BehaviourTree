@@ -1,12 +1,14 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 namespace IndieLINY.AI.BehaviourTree
 {
     public abstract class BTNAction : BTNode, IBTNAction
     {
-        public override BTEvaluateResult EValuate(EBTEvaluateState? upEvaluateState)
+        public sealed override BTEvaluateResult EValuate(EBTEvaluateState? upEvaluateState)
         {
             EBTEvaluateState state = Update();
 
@@ -18,5 +20,44 @@ namespace IndieLINY.AI.BehaviourTree
         }
 
         protected abstract EBTEvaluateState Update();
+    }
+    
+    public abstract class BTNActionAsync : BTNode, IBTNAction
+    {
+        private UniTask<EBTEvaluateState>? _task;
+        public sealed override BTEvaluateResult EValuate(EBTEvaluateState? upEvaluateState)
+        {
+            EBTEvaluateState state = EBTEvaluateState.Running;
+
+            if (_task == null)
+            {
+                _task = UpdateAsync();
+            }
+            else
+            {
+                if (_task.Value.Status.IsCompleted())
+                {
+                    state = _task.Value.AsValueTask().Result;
+                    _task = null;
+                }
+                else if (_task.Value.Status.IsCanceled())
+                {
+                    state = EBTEvaluateState.Failure;
+                    _task = null;
+                }
+            }
+
+            return new()
+            {
+                State = state,
+                ToEvaluateNode = null
+            };
+        }
+
+        protected virtual async UniTask<EBTEvaluateState> UpdateAsync()
+        {
+            await UniTask.Delay(1);
+            throw new NotImplementedException();
+        }
     }
 }

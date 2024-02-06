@@ -25,5 +25,22 @@ namespace IndieLINY.AI.BehaviourTree
         {
             return childs;
         }
+
+        public sealed override BTEvaluateResult EValuate(EBTEvaluateState? childEvaluateState)
+        {
+            if (childEvaluateState == null)
+            {
+                return DownEvaluate();
+            }
+            else
+            {
+                return UpEvaluate(childEvaluateState.Value);
+            }
+        }
+
+        protected abstract BTEvaluateResult DownEvaluate();
+        protected abstract BTEvaluateResult UpEvaluate(EBTEvaluateState childEvaluateState);
+
+
     }
 }

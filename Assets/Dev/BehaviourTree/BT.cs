@@ -1,5 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using JetBrains.Annotations;
 using UnityEngine;
 
@@ -46,7 +48,7 @@ namespace IndieLINY.AI.BehaviourTree
                 if (result.State == EBTEvaluateState.Failure)
                 {
                     var parent = node.GetParent();
-                    Debug.Assert(parent != null, "parent node is null");
+                    Debug.Assert(parent != null, "parent node can't be null");
                     if (parent is IBTNRoot)
                     {
                         _tree.EventManager.Invoke(EBTBroadcastEvent.TreeArrivedRoot);
@@ -55,11 +57,14 @@ namespace IndieLINY.AI.BehaviourTree
 
                     childEvaluateState = EBTEvaluateState.Failure;
                     node = parent;
+
+                    continue;
                 }
-                else if (result.State == EBTEvaluateState.Success)
+                
+                if (result.State == EBTEvaluateState.Success)
                 {
                     var parent = node.GetParent();
-                    Debug.Assert(parent != null, "parent node is null");
+                    Debug.Assert(parent != null, "parent node can't be null");
                     if (parent is IBTNRoot)
                     {
                         _tree.EventManager.Invoke(EBTBroadcastEvent.TreeArrivedRoot);
@@ -69,32 +74,33 @@ namespace IndieLINY.AI.BehaviourTree
 
                     childEvaluateState = EBTEvaluateState.Success;
                     node = parent;
+                    continue;
                 }
-                else if (result.State == EBTEvaluateState.Running)
+                
+                if (result.State == EBTEvaluateState.Running)
                 {
                     if (node is IBTNComposite || node is IBTNRoot)
                     {
                         childEvaluateState = null;
                         node = result.ToEvaluateNode;
-                        Debug.Assert(node != null, "composite's evaluation node is null");
+                        Debug.Assert(node != null, "composite's evaluation node can't be null at running state");
+                        continue;
                     }
-                    else if (node is IBTNAction)
+                    if (node is IBTNAction)
                     {
                         return node;
                     }
-                    else
-                    {
-                        Debug.Assert(false, "undefined state");
-                        return node;
-                    }
-                }
-                else
-                {
-                    Debug.Assert(false, "undefined state");
+                    
+                    
+                    Debug.Assert(false, "undefined running state");
                     return node;
                 }
+                
+                Debug.Assert(false, "undefined state");
+                return node;
             }
 
+            Debug.Assert(false, "undefined state");
             return node;
         }
     }
@@ -163,6 +169,7 @@ namespace IndieLINY.AI.BehaviourTree
             }
         }
     }
+    
 
     public interface IBTNode
     {
@@ -175,7 +182,7 @@ namespace IndieLINY.AI.BehaviourTree
 
     public interface IBTNRoot : IBTNode
     {
-        public void AddChild(IBTNode node);
+        public void SetChild(IBTNode node);
         public IBTNode GetChild();
     }
 
