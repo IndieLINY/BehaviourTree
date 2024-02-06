@@ -16,8 +16,8 @@ namespace IndieLINY.AI.BehaviourTree.Editor
 
         private BTEditorPresenter _presenter;
 
-        private const string VISUAL_ASSET_PATH = "Assets/Dev/BehaviourTree/BTEditor.uxml";
-        private const string STYLE_SHEET_PATH = "Assets/Dev/BehaviourTree/BTEditor.uss";
+        private const string VISUAL_ASSET_PATH = "Assets/Dev/BehaviourTree/Editor/BTEditor.uxml";
+        private const string STYLE_SHEET_PATH = "Assets/Dev/BehaviourTree/Editor/BTEditor.uss";
 
         private const string TOOLBAR_ASSET_KEY = "toolbar_menu_assets";
 

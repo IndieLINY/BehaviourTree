@@ -9,20 +9,19 @@ namespace IndieLINY.AI.BehaviourTree
         [HideInInspector] public string guid;
 
         [HideInInspector] public Vector2 nodeViewPosition;
-        [SerializeField] public List<BTNode> childs = new List<BTNode>();
-        
-        
-        
-        [SerializeField] 
-        private BTNode _parentNode;
-        
-        public BTMain TreeMain { get; private set; }
-        
-        
+        [SerializeField] public List<BTNode> childs = new();
 
-        public virtual BTNode GetParent() => _parentNode;
-        public virtual void SetParent(BTNode parent) => _parentNode = parent;
+        [SerializeField] private BTNode _parentNode;
+
+        public BTMain TreeMain { get; private set; }
+        public virtual BTNode GetParent() 
+            => _parentNode;
+        public virtual void SetParent(BTNode parent) 
+            => _parentNode = parent;
+        
+        
         public abstract BTEvaluateResult EValuate(EBTEvaluateState? upEvaluateState);
+
         public virtual void Init(BTMain treeMain)
         {
             this.TreeMain = treeMain;

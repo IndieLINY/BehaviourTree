@@ -6,6 +6,9 @@ namespace IndieLINY.AI.BehaviourTree
 {
     public abstract class BTNComposite : BTNode
     {
+        [SerializeField] public List<BTNService> services = new();
+        [SerializeField] public List<BTNDecorator> decorators = new();
+        
         public void AddChild(BTNode node)
         {
             childs.Add(node);
@@ -18,9 +21,12 @@ namespace IndieLINY.AI.BehaviourTree
             node.SetParent(null);
         }
 
+        public void Attach(BTNService service)
+            => services.Add(service);
+        public void Attach(BTNDecorator decorator)
+            => decorators.Add(decorator);
         public sealed override BTNode GetParent()
             => base.GetParent();
-
         public sealed override void SetParent(BTNode node)
             => base.SetParent(node);
         

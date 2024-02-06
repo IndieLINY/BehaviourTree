@@ -76,7 +76,7 @@ namespace IndieLINY.AI.BehaviourTree
         }
     }
 
-    public class BTNATest1 : BTNAction
+    public class BTNATest1 : BTNActionSync
     {
         public int number;
         public bool failure;
@@ -87,7 +87,7 @@ namespace IndieLINY.AI.BehaviourTree
             if (timer >= 1f)
             {
                 timer = 0f;
-                Debug.Log("test 2: " + number);
+                Debug.Log("test 1: " + number);
                 return failure ? EBTEvaluateState.Failure : EBTEvaluateState.Success;
             }
 
@@ -105,7 +105,7 @@ namespace IndieLINY.AI.BehaviourTree
         {
             await UniTask.Delay(1000);
             
-            Debug.Log("test 2: " + number);
+            Debug.Log("test 1: " + number);
             return failure ? EBTEvaluateState.Failure : EBTEvaluateState.Success;
         }
     }

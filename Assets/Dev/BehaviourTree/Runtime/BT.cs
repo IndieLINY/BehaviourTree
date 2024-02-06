@@ -168,12 +168,4 @@ namespace IndieLINY.AI.BehaviourTree
             }
         }
     }
-
-    public abstract class BTBlackboardBase
-    {
-        public T GetData<T>(string key)
-        {
-            return default;
-        }
-    }
 }
