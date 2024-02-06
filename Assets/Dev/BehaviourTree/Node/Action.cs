@@ -6,8 +6,15 @@ using UnityEngine;
 
 namespace IndieLINY.AI.BehaviourTree
 {
-    public abstract class BTNAction : BTNode, IBTNAction
+
+    public abstract class BTNAction : BTNode
     {
+        public sealed override BTNode GetParent()
+            => base.GetParent();
+
+        public sealed override void SetParent(BTNode node)
+            => base.SetParent(node);
+        
         public sealed override BTEvaluateResult EValuate(EBTEvaluateState? upEvaluateState)
         {
             EBTEvaluateState state = Update();
@@ -22,7 +29,7 @@ namespace IndieLINY.AI.BehaviourTree
         protected abstract EBTEvaluateState Update();
     }
     
-    public abstract class BTNActionAsync : BTNode, IBTNAction
+    public abstract class BTNActionAsync : BTNode
     {
         private UniTask<EBTEvaluateState>? _task;
         public sealed override BTEvaluateResult EValuate(EBTEvaluateState? upEvaluateState)

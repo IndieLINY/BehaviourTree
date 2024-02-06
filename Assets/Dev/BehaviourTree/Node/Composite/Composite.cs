@@ -4,24 +4,27 @@ using UnityEngine;
 
 namespace IndieLINY.AI.BehaviourTree
 {
-    public abstract class BTNComposite : BTNode, IBTNComposite
+    public abstract class BTNComposite : BTNode
     {
-        [SerializeField] 
-        protected List<IBTNode> childs = new List<IBTNode>();
-        
-        public void AddChild(IBTNode node)
+        public void AddChild(BTNode node)
         {
             childs.Add(node);
             node.SetParent(this);
         }
 
-        public void RemoveChild(IBTNode node)
+        public void RemoveChild(BTNode node)
         {
             childs.Remove(node);
             node.SetParent(null);
         }
 
-        public IEnumerable<IBTNode> GetChildAll()
+        public sealed override BTNode GetParent()
+            => base.GetParent();
+
+        public sealed override void SetParent(BTNode node)
+            => base.SetParent(node);
+        
+        public IEnumerable<BTNode> GetChildAll()
         {
             return childs;
         }

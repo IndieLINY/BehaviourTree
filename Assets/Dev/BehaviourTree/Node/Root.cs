@@ -4,26 +4,26 @@ using UnityEngine;
 
 namespace IndieLINY.AI.BehaviourTree
 {
-    public class BTNRoot : ScriptableObject, IBTNRoot
+    public class BTNRoot : BTNode
     {
-        [SerializeField] private IBTNode _child;
+        [SerializeField] private BTNode _child;
         
-        public IBTNode GetParent() 
+        public override BTNode GetParent() 
             => null;
 
-        public IBTNode SetParent(IBTNode parent)
+        public override void SetParent(BTNode parent)
             => throw new System.NotImplementedException();
 
-        public void SetChild(IBTNode node)
+        public void SetChild(BTNode node)
         {
             _child = node;
             node.SetParent(this);
         }
 
-        public IBTNode GetChild()
+        public BTNode GetChild()
             => _child;
         
-        public BTEvaluateResult EValuate(EBTEvaluateState? childEvaluateState)
+        public override BTEvaluateResult EValuate(EBTEvaluateState? childEvaluateState)
         {
             return new BTEvaluateResult()
             {
@@ -32,7 +32,7 @@ namespace IndieLINY.AI.BehaviourTree
             };
         }
 
-        public void Init(BTMain treeMain)
+        public override void Init(BTMain treeMain)
         {
         }
 

@@ -9,8 +9,8 @@ namespace IndieLINY.AI.BehaviourTree
 {
     public class BTExecutor
     {
-        private IBTNRoot _rootNode;
-        private IBTNode _currentNode;
+        private BTNRoot _rootNode;
+        private BTNode _currentNode;
         private BTMain _tree;
 
         public BTExecutor(BTMain treeMain)
@@ -33,7 +33,7 @@ namespace IndieLINY.AI.BehaviourTree
             Debug.Assert(_currentNode != null, "current node is null");
         }
 
-        private IBTNode EValuate(IBTNode node)
+        private BTNode EValuate(BTNode node)
         {
             Debug.Assert(node != null, "parameter is null");
 
@@ -49,7 +49,7 @@ namespace IndieLINY.AI.BehaviourTree
                 {
                     var parent = node.GetParent();
                     Debug.Assert(parent != null, "parent node can't be null");
-                    if (parent is IBTNRoot)
+                    if (parent is BTNRoot)
                     {
                         _tree.EventManager.Invoke(EBTBroadcastEvent.TreeArrivedRoot);
                         return parent;
@@ -65,7 +65,7 @@ namespace IndieLINY.AI.BehaviourTree
                 {
                     var parent = node.GetParent();
                     Debug.Assert(parent != null, "parent node can't be null");
-                    if (parent is IBTNRoot)
+                    if (parent is BTNRoot)
                     {
                         _tree.EventManager.Invoke(EBTBroadcastEvent.TreeArrivedRoot);
                         return parent;
@@ -79,20 +79,19 @@ namespace IndieLINY.AI.BehaviourTree
                 
                 if (result.State == EBTEvaluateState.Running)
                 {
-                    if (node is IBTNComposite || node is IBTNRoot)
+                    if (node is BTNComposite || node is BTNRoot)
                     {
                         childEvaluateState = null;
                         node = result.ToEvaluateNode;
                         Debug.Assert(node != null, "composite's evaluation node can't be null at running state");
                         continue;
                     }
-                    if (node is IBTNAction)
+                    if (node is BTNAction || node is BTNActionAsync)
                     {
                         return node;
                     }
                     
-                    
-                    Debug.Assert(false, "undefined running state");
+                    Debug.Assert(false, $"undefined running state, cur node: {node.GetType().ToString()}");
                     return node;
                 }
                 
@@ -118,7 +117,7 @@ namespace IndieLINY.AI.BehaviourTree
     {
         public EBTEvaluateState State;
 
-        [CanBeNull] public IBTNode ToEvaluateNode;
+        [CanBeNull] public BTNode ToEvaluateNode;
     }
 
     public enum EBTBroadcastEvent
@@ -168,47 +167,6 @@ namespace IndieLINY.AI.BehaviourTree
                 callback(evt);
             }
         }
-    }
-    
-
-    public interface IBTNode
-    {
-        public IBTNode GetParent();
-        public IBTNode SetParent(IBTNode parent);
-        public BTEvaluateResult EValuate(EBTEvaluateState? childEvaluateState);
-
-        public void Init(BTMain treeMain);
-    }
-
-    public interface IBTNRoot : IBTNode
-    {
-        public void SetChild(IBTNode node);
-        public IBTNode GetChild();
-    }
-
-    public interface IBTNAttach : IBTNode
-    {
-        public void Attach(IBTNComposite compositeNode);
-        public void Attach(IBTNAction actionNode);
-    }
-
-    public interface IBTNDecorator : IBTNAttach
-    {
-    }
-
-    public interface IBTNService : IBTNAttach
-    {
-    }
-
-    public interface IBTNComposite : IBTNode
-    {
-        public void AddChild(IBTNode node);
-        public void RemoveChild(IBTNode node);
-        public IEnumerable<IBTNode> GetChildAll();
-    }
-
-    public interface IBTNAction : IBTNode
-    {
     }
 
     public abstract class BTBlackboardBase
