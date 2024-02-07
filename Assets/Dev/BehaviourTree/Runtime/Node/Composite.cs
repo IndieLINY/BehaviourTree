@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace IndieLINY.AI.BehaviourTree
 {
-    public abstract class BTNComposite : BTNode
+    public abstract class BTNComposite : BTNode, IBTDecoratorOwner, IBTServiceOwner
     {
         [SerializeField] public List<BTNService> services = new();
         [SerializeField] public List<BTNDecorator> decorators = new();
@@ -37,15 +37,25 @@ namespace IndieLINY.AI.BehaviourTree
 
         public sealed override BTEvaluateResult EValuate(EBTEvaluateState? childEvaluateState)
         {
+            BTEvaluateResult result = default;
+            
             if (childEvaluateState == null)
-            {
-                return DownEvaluate();
+            { 
+                result = DownEvaluate();
             }
             else
             {
-                return UpEvaluate(childEvaluateState.Value);
+                result = UpEvaluate(childEvaluateState.Value);
             }
+
+            return result;
         }
+
+        public List<BTNDecorator> GetDecorators()
+            => decorators;
+
+        public List<BTNService> GetServices()
+            => services;
 
         protected abstract BTEvaluateResult DownEvaluate();
         protected abstract BTEvaluateResult UpEvaluate(EBTEvaluateState childEvaluateState);

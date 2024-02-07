@@ -1,12 +1,13 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 namespace IndieLINY.AI.BehaviourTree
 {
-    public abstract class BTNAction : BTNode
+    public abstract class BTNAction : BTNode, IBTDecoratorOwner, IBTServiceOwner
     {
         [SerializeField] public List<BTNService> services = new();
         [SerializeField] public List<BTNDecorator> decorators = new();
@@ -20,6 +21,11 @@ namespace IndieLINY.AI.BehaviourTree
         public sealed override void SetParent(BTNode node)
             => base.SetParent(node);
 
+        public List<BTNDecorator> GetDecorators()
+            => decorators;
+
+        public List<BTNService> GetServices()
+            => services;
     }
 
     public abstract class BTNActionSync : BTNAction
@@ -45,7 +51,7 @@ namespace IndieLINY.AI.BehaviourTree
         public sealed override BTEvaluateResult EValuate(EBTEvaluateState? upEvaluateState)
         {
             EBTEvaluateState state = EBTEvaluateState.Running;
-
+            
             if (_task == null)
             {
                 _task = UpdateAsync();
@@ -73,7 +79,7 @@ namespace IndieLINY.AI.BehaviourTree
 
         protected virtual async UniTask<EBTEvaluateState> UpdateAsync()
         {
-            await UniTask.Delay(1);
+            await UniTask.Delay(1, cancellationToken: new CancellationToken());
             throw new NotImplementedException();
         }
     }

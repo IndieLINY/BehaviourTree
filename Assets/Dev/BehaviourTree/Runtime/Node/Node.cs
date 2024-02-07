@@ -12,7 +12,7 @@ namespace IndieLINY.AI.BehaviourTree
         [SerializeField] public List<BTNode> childs = new();
 
         [SerializeField] private BTNode _parentNode;
-
+        
         public BTMain TreeMain { get; private set; }
         public virtual BTNode GetParent() 
             => _parentNode;

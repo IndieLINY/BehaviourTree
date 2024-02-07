@@ -20,9 +20,12 @@ namespace IndieLINY.AI.BehaviourTree
             var test1_3 = ScriptableObject.CreateInstance<ACTION_TEST>();
             
             var test2_1 = ScriptableObject.CreateInstance<ACTION_TEST>();
-            var test2_2 = ScriptableObject.CreateInstance<ACTION_TEST>();
+            var test2_2 = ScriptableObject.CreateInstance<BTNATest2Async>();
             var test2_3 = ScriptableObject.CreateInstance<ACTION_TEST>();
             var test2_4 = ScriptableObject.CreateInstance<ACTION_TEST>();
+
+            var decoratorCondition = ScriptableObject.CreateInstance<BTNDConditionTestObserveTest2>();
+            var serviceSec = ScriptableObject.CreateInstance<BTNSTestSecLog>();
             
             var sequence1 = ScriptableObject.CreateInstance<BTNCSequence>();
             var selector = ScriptableObject.CreateInstance<BTNCSelector>();
@@ -36,16 +39,19 @@ namespace IndieLINY.AI.BehaviourTree
             
             test2_1.number = 3;
             test2_2.number = 4;
-            test2_2.failure = true;
+            test2_2.failure = false;
             test2_3.number = 5;
             test2_4.number = 999;
 
+            //decoratorCondition.failure = true;
+            
             btMain.root = root;
             root.SetChild(sequence1);
             sequence1.AddChild(test1_1);
             sequence1.AddChild(test1_2);
             sequence1.AddChild(selector);
             sequence1.AddChild(test1_3);
+            sequence1.Attach(serviceSec);
             
             selector.AddChild(sequence2);
             selector.AddChild(test2_3);
@@ -53,6 +59,8 @@ namespace IndieLINY.AI.BehaviourTree
             
             sequence2.AddChild(test2_1);
             sequence2.AddChild(test2_2);
+            BTNATest2Async.fail = false;
+            sequence2.Attach(decoratorCondition);
 
             btMain.root = root;
             btMain.nodes.Add(sequence1);
@@ -65,6 +73,8 @@ namespace IndieLINY.AI.BehaviourTree
             btMain.nodes.Add(test2_2);
             btMain.nodes.Add(test2_3);
             btMain.nodes.Add(test2_4);
+            btMain.nodes.Add(decoratorCondition);
+            btMain.nodes.Add(serviceSec);
 
 
             _executor = new BTExecutor(btMain);
@@ -108,5 +118,44 @@ namespace IndieLINY.AI.BehaviourTree
             Debug.Log("test 1: " + number);
             return failure ? EBTEvaluateState.Failure : EBTEvaluateState.Success;
         }
+    }
+    public class BTNATest2Async : BTNActionAsync
+    {
+        public int number;
+        public bool failure;
+
+        static public bool fail = false;
+
+        protected override async UniTask<EBTEvaluateState> UpdateAsync()
+        {
+            await UniTask.Delay((int)(2000));
+            fail = true;
+            Debug.Log("set fail");
+            await UniTask.Delay((int)(10000));
+            
+            Debug.Log("test 2: " + number);
+            return failure ? EBTEvaluateState.Failure : EBTEvaluateState.Success;
+        }
+    }
+    public class BTNDConditionTestObserveTest2 : BTNDecorator
+    {
+    
+        public override EBTReEvauationState EValuate()
+        {
+            if (BTNATest2Async.fail)
+                Debug.Log("FA!!");
+            
+            return BTNATest2Async.fail ? EBTReEvauationState.Failure : EBTReEvauationState.Success;
+        }
+    }
+
+    public class BTNSTestSecLog : BTNService, IBTNSInterval
+    {
+        public void Update()
+        {
+            //Debug.Log("service");
+        }
+
+        public float GetInterval() => 1f;
     }
 }

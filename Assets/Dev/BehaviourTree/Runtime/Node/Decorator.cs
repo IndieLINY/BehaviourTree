@@ -1,14 +1,23 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace IndieLINY.AI.BehaviourTree
 {
-    public class BTNDecorator : BTNode
+    public abstract class BTNDecorator : BTNode
     {
-        public override BTEvaluateResult EValuate(EBTEvaluateState? upEvaluateState)
+        public sealed override BTEvaluateResult EValuate(EBTEvaluateState? upEvaluateState)
+            => throw new System.NotImplementedException();
+
+        public virtual EBTReEvauationState ReEvaluate(EBTReEvauationState reEvaluatingState)
         {
-            throw new System.NotImplementedException();
+            return reEvaluatingState;
+        }
+
+        public virtual EBTReEvauationState EValuate()
+        {
+            return EBTReEvauationState.Success;
         }
     }
 }

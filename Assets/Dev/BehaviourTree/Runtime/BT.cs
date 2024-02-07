@@ -1,5 +1,7 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using JetBrains.Annotations;
@@ -7,11 +9,17 @@ using UnityEngine;
 
 namespace IndieLINY.AI.BehaviourTree
 {
+    
     public class BTExecutor
     {
         private BTNRoot _rootNode;
         private BTNode _currentNode;
         private BTMain _tree;
+        private BTServiceScheduler _serviceScheduler;
+        private Stack<IBTDecoratorOwner> _decoOwnerStack;
+        private Stack<IBTDecoratorOwner> _decoOwnerStackSwap;
+        int countD = 0;
+
 
         public BTExecutor(BTMain treeMain)
         {
@@ -20,6 +28,10 @@ namespace IndieLINY.AI.BehaviourTree
             this._tree = treeMain;
             
             treeMain.Init();
+
+            _serviceScheduler = new();
+            _decoOwnerStack = new(10);
+            _decoOwnerStackSwap = new(10);
             
             foreach(var node in treeMain.nodes)
             {
@@ -29,31 +41,134 @@ namespace IndieLINY.AI.BehaviourTree
 
         public void Update()
         {
-            _currentNode = EValuate(_currentNode);
+            var result = DecoratorEvaluate(ref _currentNode, false);
+            _currentNode = EValuate(_currentNode, result);
             Debug.Assert(_currentNode != null, "current node is null");
         }
 
-        private BTNode EValuate(BTNode node)
+        private EBTEvaluateState? DecoratorEvaluate(ref BTNode currentNode, bool startAtLast)
+        {
+            bool failure = false;
+            int length = _decoOwnerStack.Count;
+            for (int i = startAtLast ? length - 1 : 0; i < length; i++)
+            {
+                var owner = _decoOwnerStack.Pop();
+
+                failure = false;
+                
+                foreach (var decorator in owner.GetDecorators())
+                {
+                    EBTReEvauationState reEvauationState = decorator.EValuate();
+
+                    if (reEvauationState == EBTReEvauationState.Failure)
+                    {
+                        var parent = owner.GetParent();
+                        Debug.Assert(parent != null, "parent node can't be null");
+
+                        failure = true;
+                        currentNode = parent;
+                        break;
+                    }
+                }
+
+                if (failure == false)
+                {
+                    _decoOwnerStackSwap.Push(owner);
+                }
+            }
+
+            while (_decoOwnerStackSwap.Count > 0)
+            {
+                _decoOwnerStack.Push(_decoOwnerStackSwap.Pop()); 
+            }
+
+            if (failure)
+            {
+                Debug.Assert(currentNode is not BTNAction);
+                return EBTEvaluateState.Failure;
+            }
+
+            return null;
+        }
+
+        private BTNode EValuate(BTNode node, EBTEvaluateState? childEvaluateState = null)
         {
             Debug.Assert(node != null, "parameter is null");
 
-            bool debugDone = false;
-            EBTEvaluateState? childEvaluateState = null;
-
-            while (debugDone == false)
+            bool firstCome = true;
+            while (true)
             {
+
+                if (countD > 100000)
+                {
+                    return null;
+                }
+
+                countD++;
+                
+                if (firstCome == false && node is BTNRoot)
+                {
+                    _tree.EventManager.Invoke(EBTBroadcastEvent.TreeArrivedRoot);
+                    return node;
+                }
+                firstCome = false;
+                
+                if (node is IBTDecoratorOwner decoEntryOwner)
+                {
+                    if (_decoOwnerStack.Contains(decoEntryOwner) == false)
+                    {
+                        _decoOwnerStack.Push(decoEntryOwner);
+                        childEvaluateState = DecoratorEvaluate(ref node, true);
+                    }
+                }
+                
                 var result = node.EValuate(childEvaluateState);
 
+                if (result.State != EBTEvaluateState.Running) // up evaluate 일 때
+                {
+                    if (node is IBTDecoratorOwner decoratorOwner)
+                    {
+                        foreach (var decorator in decoratorOwner.GetDecorators())
+                        {
+                            EBTReEvauationState s;
+
+                            switch (result.State)
+                            {
+                                case EBTEvaluateState.Success:
+                                    s = EBTReEvauationState.Success;
+                                    break;
+                                case EBTEvaluateState.Failure:
+                                    s = EBTReEvauationState.Failure;
+                                    break;
+                                default:
+                                    s = EBTReEvauationState.Failure;
+                                    Debug.Assert(false, "decorator undefined state");
+                                    break;
+                            }
+                        
+                            decorator.ReEvaluate(s);
+                        }
+                    }
+                }
+
+                if (node is IBTServiceOwner addingServiecOwner)
+                {
+                    _serviceScheduler.TryAddOwner(addingServiecOwner);
+                }
 
                 if (result.State == EBTEvaluateState.Failure)
                 {
+                    if (node is IBTDecoratorOwner)
+                    {
+                        _decoOwnerStack.Pop();
+                    }
+                    if (node is IBTServiceOwner removingServiecOwner)
+                    {
+                        _serviceScheduler.TryRemoveOwner(removingServiecOwner);
+                    }
+                    
                     var parent = node.GetParent();
                     Debug.Assert(parent != null, "parent node can't be null");
-                    if (parent is BTNRoot)
-                    {
-                        _tree.EventManager.Invoke(EBTBroadcastEvent.TreeArrivedRoot);
-                        return parent;
-                    }
 
                     childEvaluateState = EBTEvaluateState.Failure;
                     node = parent;
@@ -63,14 +178,17 @@ namespace IndieLINY.AI.BehaviourTree
                 
                 if (result.State == EBTEvaluateState.Success)
                 {
+                    if (node is IBTDecoratorOwner)
+                    {
+                        _decoOwnerStack.Pop();
+                    }
+                    if (node is IBTServiceOwner removingServiecOwner)
+                    {
+                        _serviceScheduler.TryRemoveOwner(removingServiecOwner);
+                    }
+                    
                     var parent = node.GetParent();
                     Debug.Assert(parent != null, "parent node can't be null");
-                    if (parent is BTNRoot)
-                    {
-                        _tree.EventManager.Invoke(EBTBroadcastEvent.TreeArrivedRoot);
-                        return parent;
-                    }
-
 
                     childEvaluateState = EBTEvaluateState.Success;
                     node = parent;
@@ -79,14 +197,14 @@ namespace IndieLINY.AI.BehaviourTree
                 
                 if (result.State == EBTEvaluateState.Running)
                 {
-                    if (node is BTNComposite || node is BTNRoot)
+                    if (node is BTNComposite or BTNRoot)
                     {
                         childEvaluateState = null;
                         node = result.ToEvaluateNode;
                         Debug.Assert(node != null, "composite's evaluation node can't be null at running state");
                         continue;
                     }
-                    if (node is BTNAction || node is BTNActionAsync)
+                    if (node is BTNAction)
                     {
                         return node;
                     }
@@ -102,6 +220,21 @@ namespace IndieLINY.AI.BehaviourTree
             Debug.Assert(false, "undefined state");
             return node;
         }
+    }
+
+    public enum EBTReEvauationState
+    {
+        Failure,
+        Success
+    }
+    public interface IBTDecoratorOwner
+    {
+        public List<BTNDecorator> GetDecorators();
+        public BTNode GetParent();
+    }
+    public interface IBTServiceOwner
+    {
+        public List<BTNService> GetServices();
     }
 
     [System.Serializable]
