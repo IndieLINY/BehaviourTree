@@ -26,5 +26,18 @@ namespace IndieLINY.AI.BehaviourTree
         {
             this.TreeMain = treeMain;
         }
+
+        public void Cancel()
+        {
+            OnCanceled();
+            foreach (var child in childs)
+            {
+                child.Cancel();
+            }
+        }
+
+        public virtual void OnCanceled()
+        {
+        }
     }
 }

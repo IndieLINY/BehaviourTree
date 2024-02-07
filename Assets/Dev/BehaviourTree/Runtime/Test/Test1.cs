@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 
@@ -111,7 +112,7 @@ namespace IndieLINY.AI.BehaviourTree
         public int number;
         public bool failure;
 
-        protected override async UniTask<EBTEvaluateState> UpdateAsync()
+        protected override async UniTask<EBTEvaluateState> UpdateAsync(CancellationTokenSource token)
         {
             await UniTask.Delay(1000);
             
@@ -126,15 +127,30 @@ namespace IndieLINY.AI.BehaviourTree
 
         static public bool fail = false;
 
-        protected override async UniTask<EBTEvaluateState> UpdateAsync()
+        protected override async UniTask<EBTEvaluateState> UpdateAsync(CancellationTokenSource token)
         {
-            await UniTask.Delay((int)(2000));
+            await UniTask.Delay(2000, cancellationToken:token.Token);
+            
+            if(token.IsCancellationRequested)
+                return failure ? EBTEvaluateState.Failure : EBTEvaluateState.Success;
+            
             fail = true;
             Debug.Log("set fail");
-            await UniTask.Delay((int)(10000));
+            
+            await UniTask.Delay(10000, cancellationToken:token.Token);
+            
+            if(token.IsCancellationRequested)
+                return failure ? EBTEvaluateState.Failure : EBTEvaluateState.Success;
             
             Debug.Log("test 2: " + number);
+            
             return failure ? EBTEvaluateState.Failure : EBTEvaluateState.Success;
+            
+        }
+
+        public override void OnCanceled()
+        {
+            Debug.Log("canceled");
         }
     }
     public class BTNDConditionTestObserveTest2 : BTNDecorator
@@ -153,7 +169,7 @@ namespace IndieLINY.AI.BehaviourTree
     {
         public void Update()
         {
-            //Debug.Log("service");
+//            Debug.Log("service");
         }
 
         public float GetInterval() => 1f;

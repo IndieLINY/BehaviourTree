@@ -47,6 +47,7 @@ namespace IndieLINY.AI.BehaviourTree
     public abstract class BTNActionAsync : BTNAction
     {
         private UniTask<EBTEvaluateState>? _task;
+        protected CancellationTokenSource _cancellationTokenSource;
         
         public sealed override BTEvaluateResult EValuate(EBTEvaluateState? upEvaluateState)
         {
@@ -54,7 +55,7 @@ namespace IndieLINY.AI.BehaviourTree
             
             if (_task == null)
             {
-                _task = UpdateAsync();
+                _task = UpdateAsync(_cancellationTokenSource = new());
             }
             else
             {
@@ -62,11 +63,13 @@ namespace IndieLINY.AI.BehaviourTree
                 {
                     state = _task.Value.AsValueTask().Result;
                     _task = null;
+                    _cancellationTokenSource = null;
                 }
                 else if (_task.Value.Status.IsCanceled())
                 {
                     state = EBTEvaluateState.Failure;
                     _task = null;
+                    _cancellationTokenSource = null;
                 }
             }
 
@@ -77,10 +80,15 @@ namespace IndieLINY.AI.BehaviourTree
             };
         }
 
-        protected virtual async UniTask<EBTEvaluateState> UpdateAsync()
+        protected virtual async UniTask<EBTEvaluateState> UpdateAsync(CancellationTokenSource cancellationTokenSource)
         {
-            await UniTask.Delay(1, cancellationToken: new CancellationToken());
             throw new NotImplementedException();
+        }
+
+        public override void OnCanceled()
+        {
+            _cancellationTokenSource?.Cancel();
+            _cancellationTokenSource = null;
         }
     }
 }
