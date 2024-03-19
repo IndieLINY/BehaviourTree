@@ -1,11 +1,10 @@
 {
-    "name": "SampleGame",
+    "name": "IndieLINYBehaviourTreeTest",
     "rootNamespace": "",
     "references": [
+        "GUID:e4b77ccaa3998d24cbadcdc2623cdf3e",
         "GUID:f51ebe6a0ceec4240a699833d6309b23",
-        "GUID:5c01796d064528144a599661eaab93a6",
-        "GUID:029c1c1b674aaae47a6841a0b89ad80e",
-        "GUID:e4b77ccaa3998d24cbadcdc2623cdf3e"
+        "GUID:27619889b8ba8c24980f49ee34dbb44a"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
@@ -13,7 +12,9 @@
     "overrideReferences": false,
     "precompiledReferences": [],
     "autoReferenced": true,
-    "defineConstraints": [],
+    "defineConstraints": [
+        "UNITY_INCLUDE_TESTS"
+    ],
     "versionDefines": [],
     "noEngineReferences": false
 }

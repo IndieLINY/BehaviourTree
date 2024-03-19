@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
@@ -114,7 +115,7 @@ namespace IndieLINY.AI.BehaviourTree
 
         protected override async UniTask<EBTEvaluateState> UpdateAsync(CancellationTokenSource token)
         {
-            await UniTask.Delay(1000);
+            await UniTask.Delay(1000, cancellationToken: token.Token);
             
             Debug.Log("test 1: " + number);
             return failure ? EBTEvaluateState.Failure : EBTEvaluateState.Success;
@@ -131,16 +132,10 @@ namespace IndieLINY.AI.BehaviourTree
         {
             await UniTask.Delay(2000, cancellationToken:token.Token);
             
-            if(token.IsCancellationRequested)
-                return failure ? EBTEvaluateState.Failure : EBTEvaluateState.Success;
-            
             fail = true;
             Debug.Log("set fail");
             
             await UniTask.Delay(10000, cancellationToken:token.Token);
-            
-            if(token.IsCancellationRequested)
-                return failure ? EBTEvaluateState.Failure : EBTEvaluateState.Success;
             
             Debug.Log("test 2: " + number);
             

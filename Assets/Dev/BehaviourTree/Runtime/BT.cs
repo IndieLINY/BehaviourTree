@@ -19,7 +19,6 @@ namespace IndieLINY.AI.BehaviourTree
         private Stack<IBTDecoratorOwner> _decoOwnerStackSwap;
         int countD = 0;
 
-        private int index = 0;
         
         public BTExecutor(BTMain treeMain)
         {
@@ -41,13 +40,12 @@ namespace IndieLINY.AI.BehaviourTree
 
         public void Update()
         {
-            var result = DecoratorEvaluate(ref _currentNode, false);
+            var result = EvaluateDecorator(ref _currentNode, false);
             _currentNode = EValuate(_currentNode, result);
-            index++;
             Debug.Assert(_currentNode != null, "current node is null");
         }
 
-        private EBTEvaluateState? DecoratorEvaluate(ref BTNode currentNode, bool startAtLast)
+        private EBTEvaluateState? EvaluateDecorator(ref BTNode currentNode, bool startAtLast)
         {
             bool failureFlag = false;
             int length = _decoOwnerStack.Count;
@@ -86,7 +84,7 @@ namespace IndieLINY.AI.BehaviourTree
 
                     if (owner is BTNode btNode)
                     {
-                        //btNode.Cancel();
+                        btNode.Cancel();
                     }
                 }
             }
@@ -100,7 +98,6 @@ namespace IndieLINY.AI.BehaviourTree
             if (failureFlag)
             {
                 Debug.Assert(currentNode is not BTNAction);
-                Debug.Log(index);
                 return EBTEvaluateState.Failure;
             }
 
@@ -135,7 +132,7 @@ namespace IndieLINY.AI.BehaviourTree
                     if (_decoOwnerStack.Contains(decoEntryOwner) == false)
                     {
                         _decoOwnerStack.Push(decoEntryOwner);
-                        childEvaluateState = DecoratorEvaluate(ref node, true);
+                        childEvaluateState = EvaluateDecorator(ref node, true);
                     }
                 }
 
